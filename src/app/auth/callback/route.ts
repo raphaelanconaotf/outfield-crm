@@ -2,28 +2,33 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { ALLOWED_DOMAIN } from "@/lib/auth";
 
+function back(origin: string, error: string, detalhe?: string | null) {
+  const url = new URL("/login", origin);
+  url.searchParams.set("error", error);
+  if (detalhe) url.searchParams.set("detalhe", detalhe.slice(0, 300));
+  return NextResponse.redirect(url);
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = request.nextUrl;
   const code = searchParams.get("code");
 
   // O Supabase devolve erro aqui quando o gatilho de cadastro recusa o e-mail.
   if (searchParams.get("error")) {
-    return NextResponse.redirect(`${origin}/login?error=nao_autorizado`);
+    return back(origin, "nao_autorizado", searchParams.get("error_description"));
   }
-  if (!code) {
-    return NextResponse.redirect(`${origin}/login?error=sem_codigo`);
-  }
+  if (!code) return back(origin, "sem_codigo");
 
   const supabase = await createClient();
   const { data, error } = await supabase.auth.exchangeCodeForSession(code);
   if (error || !data.user) {
-    return NextResponse.redirect(`${origin}/login?error=nao_autorizado`);
+    return back(origin, "falha_login", error?.message ?? "sessão não criada");
   }
 
   const email = data.user.email?.toLowerCase() ?? "";
   if (!email.endsWith(`@${ALLOWED_DOMAIN}`)) {
     await supabase.auth.signOut();
-    return NextResponse.redirect(`${origin}/login?error=dominio`);
+    return back(origin, "dominio", email);
   }
 
   return NextResponse.redirect(`${origin}/`);

@@ -7,14 +7,15 @@ const ERRORS: Record<string, string> = {
   dominio: "Use sua conta Google @outfieldinc.com.",
   inativo: "Seu acesso está desativado. Fale com um Admin.",
   sem_codigo: "O login não foi concluído. Tente novamente.",
+  falha_login: "Não foi possível concluir o login. Tente novamente em uma aba anônima.",
 };
 
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; detalhe?: string }>;
 }) {
-  const { error } = await searchParams;
+  const { error, detalhe } = await searchParams;
   const profile = await getProfile();
   if (profile?.ativo && !error) redirect("/");
 
@@ -32,6 +33,7 @@ export default async function LoginPage({
         {error && ERRORS[error] && (
           <p role="alert" className="mb-4 rounded-lg bg-danger-soft px-3 py-2 text-sm text-danger">
             {ERRORS[error]}
+            {detalhe && <span className="mt-1 block text-xs opacity-80">Detalhe técnico: {detalhe}</span>}
           </p>
         )}
 
