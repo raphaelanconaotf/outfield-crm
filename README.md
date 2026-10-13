@@ -7,7 +7,7 @@ Stack: Next.js (App Router) + Supabase (Postgres, Auth, RLS) + Vercel.
 
 | Entrega | Escopo | Status |
 | --- | --- | --- |
-| 1 · Fundação | Login Google @outfieldinc.com, perfis Admin/Sócio/Equipe, RLS, tela de Admin, schema completo | ✅ código pronto |
+| 1 · Fundação | Login Google @outfieldinc.com, perfis Admin/Sócio/Equipe, RLS, tela de Admin, schema completo | ✅ código pronto · banco via integração GitHub do Supabase |
 | 2 · Contatos | Empresas, contatos, interações, busca, importação CSV | — |
 | 3 · Vendas | Pipeline kanban, valores protegidos, Ganha → Projeto | — |
 | 4 · Projetos e tarefas | Projetos, equipe, kanban de tarefas, dashboard | — |
@@ -26,7 +26,7 @@ Só entra quem foi autorizado na tela **Admin** e tem conta Google `@outfieldinc
 
 ### 1. Supabase
 1. Crie um projeto em supabase.com (região **South America (São Paulo)**).
-2. SQL Editor → cole e rode `supabase/migrations/20261013000000_init.sql`
+2. As migrações em `supabase/migrations` são aplicadas automaticamente pela integração GitHub do Supabase a cada push na `main` (Working directory `.`, Deploy to production ligado). Alternativa manual: SQL Editor → cole e rode `supabase/migrations/20261013000000_init.sql`
    (ou `supabase db push` com a CLI).
 3. Project Settings → API: copie a **Project URL** e a **anon public key**.
 
